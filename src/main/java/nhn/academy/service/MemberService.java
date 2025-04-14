@@ -1,5 +1,6 @@
 package nhn.academy.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nhn.academy.model.Member;
 import nhn.academy.model.MemberCreateCommand;
 import nhn.academy.model.exception.MemberAlreadyExistsException;
@@ -18,6 +19,9 @@ public class MemberService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
+    private ObjectMapper redisMapper;
+
     private String HASH_NAME = "Member:";
 
     public void createMember(MemberCreateCommand memberCreateCommand) {
@@ -33,7 +37,7 @@ public class MemberService {
         Map<Object, Object> entries = redisTemplate.opsForHash().entries(HASH_NAME);
         List<Member> members = new ArrayList<>(entries.size());
         for (Object value : entries.values()) {
-            members.add((Member) value);
+            members.add(redisMapper.convertValue(value, Member.class));
         }
         return members;
     }
@@ -44,7 +48,7 @@ public class MemberService {
         if (o == null) {
             throw new MemberNotFoundException();
         }
-        return (Member) o;
+        return redisMapper.convertValue(o, Member.class);
     }
 
     public Member updateMember(String memberId) {
