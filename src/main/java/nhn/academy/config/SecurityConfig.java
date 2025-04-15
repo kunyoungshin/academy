@@ -3,7 +3,7 @@ package nhn.academy.config;
 import nhn.academy.auth.CustomAuthenticationFailureHandler;
 import nhn.academy.auth.CustomAuthenticationSuccessHandler;
 import nhn.academy.auth.CustomUserDetailsService;
-import nhn.academy.service.LoginAttemptService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,20 +17,25 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
 
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    @Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        LoginAttemptService loginAttemptService = new LoginAttemptService();
-        CustomAuthenticationFailureHandler customAuthenticationFailureHandler = new CustomAuthenticationFailureHandler(loginAttemptService);
-        CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler = new CustomAuthenticationSuccessHandler(loginAttemptService);
+//        CustomAuthenticationFailureHandler customAuthenticationFailureHandler = new CustomAuthenticationFailureHandler(loginAttemptService);
+//        CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler = new CustomAuthenticationSuccessHandler(loginAttemptService);
         http.csrf(AbstractHttpConfigurer::disable);
         http.formLogin((formLogin) ->
                 formLogin.loginPage("/auth/login")
                         .usernameParameter("id")
                         .passwordParameter("pwd")
                         .loginProcessingUrl("/auth/login/process")
-                        .failureHandler(customAuthenticationFailureHandler)
                         .successHandler(customAuthenticationSuccessHandler)
+                        .failureHandler(customAuthenticationFailureHandler)
+
 
         ).authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests.requestMatchers("/admin/**").hasRole("ADMIN")
