@@ -24,7 +24,6 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         loginFailureCounter.reset(authentication.getName());
 
         // 원래 요청한 URL로 리다이렉트
-//        super.onAuthenticationSuccess(request, response, authentication);
-        getRedirectStrategy().sendRedirect(request, response, "/");
+        super.onAuthenticationSuccess(request, response, authentication);
     }
 }
