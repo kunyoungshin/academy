@@ -67,6 +67,6 @@ public class Member {
 
     public void encodePassword(PasswordEncoder passwordEncoder) {
         //TODO 필요한 경우만 할 수 있도록.. 이미 인코딩 된 패스워드는 인코드하지않아도됨.
-//        setPassword(passwordEncoder.encode(password));
+        setPassword(passwordEncoder.encode(password));
     }
 }
