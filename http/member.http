@@ -21,12 +21,12 @@ GET localhost:8080/members/man
 ### 멤버생성
 POST localhost:8080/members
 Content-Type: application/json
-Accept-Language: en
 
 {
-  "id" : "shin",
+  "id" : "shina",
   "name" : "신건영",
-  "age" : 20,
+  "age" : 30,
   "class" : "A",
-  "role" : "member"
+  "role" : "member",
+  "password": "asd"
 }
