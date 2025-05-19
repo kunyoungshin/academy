@@ -15,7 +15,7 @@ GET localhost:8080/members/shin
 
 
 ### 멤버조회
-GET localhost:8080/members/man
+GET localhost:8080/members/shin
 
 
 ### 멤버생성
@@ -23,7 +23,7 @@ POST localhost:8080/members
 Content-Type: application/json
 
 {
-  "id" : "shina",
+  "id" : "shin",
   "name" : "신건영",
   "age" : 30,
   "class" : "A",
