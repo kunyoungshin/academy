@@ -30,29 +30,7 @@ public class MemberEntity {
     public MemberEntity() {
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public void setClazz(ClassType clazz) {
-        this.clazz = clazz;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getId() {
         return id;
