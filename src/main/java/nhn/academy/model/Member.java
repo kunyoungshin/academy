@@ -27,6 +27,14 @@ public class Member {
 
     }
 
+    public Member(MemberEntity value) {
+        this.id = value.getId();
+        this.name = value.getName();
+        this.age = value.getAge();
+        this.clazz = value.getClazz();
+        this.role = value.getRole();
+    }
+
     public String getName() {
         return name;
     }
