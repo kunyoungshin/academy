@@ -16,8 +16,7 @@ public class AuthUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //TODO
-//        return Arrays.asList(new SimpleGrantedAuthority());
+        //TODO 변경
         return Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
