@@ -9,27 +9,28 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class AuthUser implements UserDetails {
-
+    private String encodedPassword;
+    private String username;
+    private Role role;
     public AuthUser(MemberEntity memberEntity) {
-        //TODO
+        this.username = memberEntity.getName();
+        this.encodedPassword = memberEntity.getPassword();
+        this.role = memberEntity.getRole();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //TODO 변경
-        return Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+        return Arrays.asList(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
     public String getPassword() {
-        //TODO
-        return "";
+        return this.encodedPassword;
     }
 
     @Override
     public String getUsername() {
-        //TODO
-        return "";
+        return this.username;
     }
 
 }
