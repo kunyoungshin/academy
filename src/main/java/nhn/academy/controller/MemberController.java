@@ -19,10 +19,6 @@ public class MemberController {
         return "신건영";
     }
 
-    @GetMapping("/me")
-    public Member getMe(){
-        return new Member("mandoo","신건영", 20, ClassType.A, Role.ADMIN);
-    }
 
     @PostMapping("/members")
     public ResponseEntity addMember(@RequestBody MemberCreateCommand memberCreateCommand,

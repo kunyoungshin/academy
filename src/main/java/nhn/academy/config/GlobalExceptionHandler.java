@@ -18,8 +18,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MemberNotFoundException.class)
-    public ResponseEntity<String> handleMemberAlreadyExistsException(MemberNotFoundException ex) {
-        // 409 Conflict 응답과 함께 에러 메시지 반환
+    public ResponseEntity<String> handleMemberNotFoundException(MemberNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 

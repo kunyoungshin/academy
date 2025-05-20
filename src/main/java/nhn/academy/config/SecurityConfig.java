@@ -2,13 +2,13 @@ package nhn.academy.config;
 
 import nhn.academy.auth.CustomAuthenticationFailureHandler;
 import nhn.academy.auth.CustomAuthenticationSuccessHandler;
-import nhn.academy.auth.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,25 +37,25 @@ public class SecurityConfig {
                         .failureHandler(customAuthenticationFailureHandler)
 
 
+
         ).authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests.requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/private-project/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MEMBER")
                         .requestMatchers("/public-project/**").permitAll()
                         .requestMatchers("/auth/login/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/members").permitAll()
                         .anyRequest().authenticated()
         );
-
+        // csrf diable
+        http.csrf(AbstractHttpConfigurer::disable);
+        // UsernamePasswordAuthenticationFilter가 활성화
+        http.formLogin(Customizer.withDefaults());
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService(passwordEncoder());
     }
 
 }
