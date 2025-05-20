@@ -17,13 +17,13 @@ public class MemberEntity {
     private String password;
 
 
-    public MemberEntity(MemberCreateCommand memberCreateCommand, PasswordEncoder passwordEncoder) {
+    public MemberEntity(MemberCreateCommand memberCreateCommand, String encodedPassword) {
         this.id = memberCreateCommand.getId();
         this.name = memberCreateCommand.getName();
         this.age = memberCreateCommand.getAge();
         this.clazz = memberCreateCommand.getClazz();
         this.role = memberCreateCommand.getRole();
-        this.password = passwordEncoder.encode(memberCreateCommand.getPassword());
+        this.password = encodedPassword;
     }
 
     public MemberEntity() {

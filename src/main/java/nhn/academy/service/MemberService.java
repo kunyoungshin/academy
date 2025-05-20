@@ -37,7 +37,7 @@ public class MemberService {
             throw new MemberAlreadyExistsException("already used id");
         }
 
-        MemberEntity memberEntity = new MemberEntity(memberCreateCommand, passwordEncoder);
+        MemberEntity memberEntity = new MemberEntity(memberCreateCommand, passwordEncoder.encode(memberCreateCommand.getPassword()));
         redisTemplate.opsForHash().put(HASH_NAME, memberEntity.getId(), memberEntity);
     }
 
