@@ -22,29 +22,15 @@ public class MemberService {
     private String HASH_NAME = "Member:";
 
     public void createMember(MemberCreateCommand memberCreateCommand) {
-        Object o = redisTemplate.opsForHash().get(HASH_NAME, memberCreateCommand.getId());
-        if (o != null) {
-            throw new MemberAlreadyExistsException("already used id");
-        }
-        MemberEntity memberEntity = new MemberEntity(memberCreateCommand);
-        redisTemplate.opsForHash().put(HASH_NAME, memberEntity.getId(), memberEntity);
+        //TODO
     }
 
     public List<Member> getMembers() {
-        Map<Object, Object> entries = redisTemplate.opsForHash().entries(HASH_NAME);
-        List<Member> members = new ArrayList<>(entries.size());
-        for (Object value : entries.values()) {
-            members.add(new Member((MemberEntity) value));
-        }
-        return members;
+        //TODO
     }
 
     public Member getMember(String memberId) {
-        Object o = redisTemplate.opsForHash().get(HASH_NAME, memberId);
-        if (o == null) {
-            throw new MemberNotFoundException();
-        }
-        return new Member((MemberEntity) o);
+        //TODO
     }
 
     public Member updateMember(String memberId) {
