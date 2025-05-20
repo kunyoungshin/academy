@@ -3,6 +3,7 @@ package nhn.academy.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 public class MemberEntity {
@@ -16,15 +17,13 @@ public class MemberEntity {
     private String password;
 
 
-    public MemberEntity(MemberCreateCommand memberCreateCommand) {
-        //TODO
-
+    public MemberEntity(MemberCreateCommand memberCreateCommand, PasswordEncoder passwordEncoder) {
         this.id = memberCreateCommand.getId();
         this.name = memberCreateCommand.getName();
         this.age = memberCreateCommand.getAge();
         this.clazz = memberCreateCommand.getClazz();
         this.role = memberCreateCommand.getRole();
-        this.password = memberCreateCommand.getPassword();
+        this.password = passwordEncoder.encode(memberCreateCommand.getPassword());
     }
 
     public MemberEntity() {

@@ -10,6 +10,7 @@ import nhn.academy.model.exception.MemberAlreadyExistsException;
 import nhn.academy.model.exception.MemberNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,6 +26,9 @@ public class MemberService {
     @Autowired
     private ObjectMapper redisMapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private String HASH_NAME = "Member:";
 
     public void createMember(MemberCreateCommand memberCreateCommand) {
@@ -33,7 +37,7 @@ public class MemberService {
             throw new MemberAlreadyExistsException("already used id");
         }
 
-        MemberEntity memberEntity = new MemberEntity(memberCreateCommand);
+        MemberEntity memberEntity = new MemberEntity(memberCreateCommand, passwordEncoder);
         redisTemplate.opsForHash().put(HASH_NAME, memberEntity.getId(), memberEntity);
     }
 
@@ -55,6 +59,15 @@ public class MemberService {
         MemberEntity memberEntity = redisMapper.convertValue(o, MemberEntity.class);
         return new Member(memberEntity);
     }
+
+    public MemberEntity getMemberEntity(String memberId) {
+        Object o = redisTemplate.opsForHash().get(HASH_NAME, memberId);
+        if (o == null) {
+            throw new MemberNotFoundException();
+        }
+        return redisMapper.convertValue(o, MemberEntity.class);
+    }
+
 
     public Member updateMember(String memberId) {
 
