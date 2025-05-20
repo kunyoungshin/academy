@@ -18,13 +18,7 @@ public class MemberEntity {
 
     public MemberEntity(MemberCreateCommand memberCreateCommand) {
         //TODO
-
-        this.id = memberCreateCommand.getId();
-        this.name = memberCreateCommand.getName();
-        this.age = memberCreateCommand.getAge();
-        this.clazz = memberCreateCommand.getClazz();
-        this.role = memberCreateCommand.getRole();
-        this.password = memberCreateCommand.getPassword();
+        
     }
 
     public MemberEntity() {
