@@ -5,10 +5,12 @@ import nhn.academy.model.Member;
 import nhn.academy.model.MemberCreateCommand;
 import nhn.academy.model.MemberLoginRequest;
 import nhn.academy.model.exception.InvalidPasswordException;
+import nhn.academy.model.MemberEntity;
 import nhn.academy.model.exception.MemberAlreadyExistsException;
 import nhn.academy.model.exception.MemberNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,6 +26,12 @@ public class MemberService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
+    private ObjectMapper redisMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private String HASH_NAME = "Member:";
 
     public void createMember(MemberCreateCommand memberCreateCommand) {
@@ -31,27 +39,38 @@ public class MemberService {
         if (o != null) {
             throw new MemberAlreadyExistsException("already used id");
         }
-        Member member = new Member(memberCreateCommand.getId(), memberCreateCommand.getName(), memberCreateCommand.getAge(), memberCreateCommand.getClazz(), memberCreateCommand.getRole(), memberCreateCommand.getPassword());
-        redisTemplate.opsForHash().put(HASH_NAME, member.getId(), member);
+
+        MemberEntity memberEntity = new MemberEntity(memberCreateCommand, passwordEncoder.encode(memberCreateCommand.getPassword()));
+        redisTemplate.opsForHash().put(HASH_NAME, memberEntity.getId(), memberEntity);
     }
 
     public List<Member> getMembers() {
         Map<Object, Object> entries = redisTemplate.opsForHash().entries(HASH_NAME);
         List<Member> members = new ArrayList<>(entries.size());
         for (Object value : entries.values()) {
-            members.add((Member) value);
+            MemberEntity memberEntity = redisMapper.convertValue(value, MemberEntity.class);
+            members.add(new Member(memberEntity));
         }
         return members;
     }
 
     public Member getMember(String memberId) {
-
         Object o = redisTemplate.opsForHash().get(HASH_NAME, memberId);
         if (o == null) {
             throw new MemberNotFoundException();
         }
-        return objectMapper.convertValue(o, Member.class);
+        MemberEntity memberEntity = redisMapper.convertValue(o, MemberEntity.class);
+        return new Member(memberEntity);
     }
+
+    public MemberEntity getMemberEntity(String memberId) {
+        Object o = redisTemplate.opsForHash().get(HASH_NAME, memberId);
+        if (o == null) {
+            throw new MemberNotFoundException();
+        }
+        return redisMapper.convertValue(o, MemberEntity.class);
+    }
+
 
     public Member updateMember(String memberId) {
 

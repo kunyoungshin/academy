@@ -5,7 +5,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import nhn.academy.model.AuthUser;
 import nhn.academy.model.Member;
+import nhn.academy.model.annotation.Auth;
 import nhn.academy.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,7 +27,7 @@ public class RedisSessionFilter extends OncePerRequestFilter {
     private MemberService memberService;
 
     @Autowired
-    private RedisTemplate<String, Object> sessionRedisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
 
     @Override
@@ -46,14 +48,19 @@ public class RedisSessionFilter extends OncePerRequestFilter {
 
         if (sessionId != null) {
             // Redis에서 인증 정보 가져오기
-            Object o = sessionRedisTemplate.opsForValue().get(sessionId);
+            Object o = redisTemplate.opsForValue().get(sessionId);
             String username = (String) o;
             if (username != null) {
-                Member baek = memberService.getMember(username);
-                AcademyUser academyUser = new AcademyUser(baek);
-                Authentication auth = new PreAuthenticatedAuthenticationToken(academyUser, null, academyUser.getAuthorities());
-                auth.setAuthenticated(true);
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                try {
+                    Member member = memberService.getMember(username);
+                    AuthUser authUser = new AuthUser(member);
+                    Authentication auth = new PreAuthenticatedAuthenticationToken(authUser, null, authUser.getAuthorities());
+                    auth.setAuthenticated(true);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }catch (Exception e) {
+
+                }
+
             }
         }
 
