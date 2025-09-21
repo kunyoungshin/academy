@@ -9,10 +9,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+
 
     @GetMapping("/name")
     public String getName(){

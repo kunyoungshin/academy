@@ -35,4 +35,16 @@ public class MemberCreateCommand {
     public String getPassword() {
         return password;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public ClassType getClazz() {
+        return clazz;
+    }
 }
