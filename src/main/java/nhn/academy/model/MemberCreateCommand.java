@@ -19,4 +19,16 @@ public class MemberCreateCommand {
     public void setClazz(ClassType clazz) {
         this.clazz = clazz;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public ClassType getClazz() {
+        return clazz;
+    }
 }
