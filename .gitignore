@@ -1,1 +1,7 @@
 *.cmd
+.idea
+
+academy.iml
+*.iml
+
+target/

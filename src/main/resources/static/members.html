@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <title>Members</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 24px; }
+        h1 { font-size: 20px; margin-bottom: 12px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f8f8f8; }
+        .badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; border: 1px solid #ccc; }
+        .GOLD   { background: #fff7d6; border-color: #f0c200; }
+        .SILVER { background: #f0f3f6; border-color: #aab1b8; }
+        .BRONZE { background: #f7efe9; border-color: #b3713a; }
+        #error { color: #b00020; margin: 8px 0; display:none; }
+    </style>
+</head>
+<body>
+<h1>Members</h1>
+<div id="error"></div>
+<table aria-label="members table">
+    <thead>
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Age</th>
+        <th scope="col">Class</th>
+    </tr>
+    </thead>
+    <tbody id="rows">
+    <tr><td colspan="3">Loading...</td></tr>
+    </tbody>
+</table>
+
+<h2>Add Member</h2>
+<form id="addForm">
+    <label>
+        Name:
+        <input type="text" name="name" required />
+    </label>
+    <label>
+        Age:
+        <input type="number" name="age" required />
+    </label>
+    <label>
+        Class:
+        <select name="clazz" required>
+            <option value="GOLD">A</option>
+            <option value="SILVER">B</option>
+            <option value="BRONZE">C</option>
+        </select>
+    </label>
+    <button type="submit">Add</button>
+</form>
+
+<script>
+    async function loadMembers() {
+        const tbody = document.getElementById('rows');
+        const err = document.getElementById('error');
+        try {
+            const res = await fetch('/members');
+            if (!res.ok) throw new Error(res.status);
+            const data = await res.json();
+            tbody.innerHTML = '';
+            for (const m of data) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+            <td>${escapeHtml(m.name ?? '')}</td>
+            <td>${m.age ?? ''}</td>
+            <td><span class="badge ${m["class"]}">${m["class"]}</span></td>
+          `;
+                tbody.appendChild(tr);
+            }
+        } catch (e) {
+            err.textContent = '목록 로드 실패: ' + e.message;
+            err.style.display = 'block';
+        }
+    }
+
+    document.getElementById('addForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const payload = {
+            name: form.name.value,
+            age: parseInt(form.age.value, 10),
+            clazz: form.clazz.value
+        };
+        try {
+            const res = await fetch('/members', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error(res.status);
+            form.reset();
+            await loadMembers(); // 성공 시 목록 갱신
+        } catch (err) {
+            alert('추가 실패: ' + err.message);
+        }
+    });
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g,
+            c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    loadMembers();
+</script>
+</body>
+</html>
