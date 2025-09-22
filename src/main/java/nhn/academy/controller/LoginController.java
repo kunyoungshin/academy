@@ -22,12 +22,10 @@ public class LoginController {
         return "login";
     }
 
-
     @PostMapping
     public ModelAndView processLogin(@ModelAttribute MemberLoginRequest loginRequest, HttpSession session)  {
         Member memberResponse = memberService.login(loginRequest);
         ModelAndView mav = new ModelAndView("home");
-        mav.addObject("loginName", memberResponse.getName());
         HttpSession newSession = session;   // 실전은 request.getSession(true) 새 세션 발급이 적절
         newSession.setAttribute(LOGIN_USER, memberResponse);
         return mav;

@@ -25,7 +25,7 @@
             }
 
             const user = await res.json();
-            document.getElementById('content').innerText = `Welcome, ${user.name}`;
+            document.getElementById('content').innerText = `Welcome!! ${user.name}`;
         } catch (e) {
             document.getElementById('content').innerText = '에러 발생: ' + e;
         }
