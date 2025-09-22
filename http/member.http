@@ -14,19 +14,19 @@ GET localhost:8080/members
 GET localhost:8080/members/shin
 
 
-### 멤버조회
-GET localhost:8080/members/shin
+### 조회
+GET localhost:8080/members/mandoo
 
 
-### 멤버생성
+###
 POST localhost:8080/members
 Content-Type: application/json
 
 {
-  "id" : "admin",
+  "id" : "mandoo",
   "name" : "신건영",
   "age" : 30,
   "class" : "A",
   "role" : "member",
-  "password": "admin"
+  "password": "mandoo"
 }

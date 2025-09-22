@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 public class Member {
     private String id;
     private String name;
-    private Integer age;
     @JsonSerialize(using = ToStringSerializer.class)
+    private Integer age;
     @JsonProperty("class")
     private ClassType clazz;
     private Role role;
