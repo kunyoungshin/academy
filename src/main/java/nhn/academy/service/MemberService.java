@@ -27,10 +27,12 @@ public class MemberService {
 
     public List<Member> getMembers() {
         //TODO
+        return null;
     }
 
     public Member getMember(String memberId) {
         //TODO
+        return null;
     }
 
     public Member updateMember(String memberId) {
