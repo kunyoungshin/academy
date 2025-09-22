@@ -5,7 +5,33 @@
     <title>Home</title>
 </head>
 <body>
-Welcome, <span th:text="${loginName}" /><br />
+<div id="content">
+    Loading...
+</div>
+
 <a href="/logout">Logout</a>
+
+<script>
+    async function loadUser() {
+        try {
+            const res = await fetch('/me');
+            if (res.status === 401) {
+                document.getElementById('content').innerText = '로그인이 필요합니다.';
+                return;
+            }
+            if (!res.ok) {
+                document.getElementById('content').innerText = '사용자 정보를 불러오지 못했습니다.';
+                return;
+            }
+
+            const user = await res.json();
+            document.getElementById('content').innerText = `Welcome, ${user.name}`;
+        } catch (e) {
+            document.getElementById('content').innerText = '에러 발생: ' + e;
+        }
+    }
+
+    loadUser();
+</script>
 </body>
 </html>

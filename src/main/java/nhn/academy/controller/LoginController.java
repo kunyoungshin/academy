@@ -1,5 +1,6 @@
 package nhn.academy.controller;
 
+import jakarta.servlet.http.HttpSession;
 import nhn.academy.model.Member;
 import nhn.academy.model.MemberLoginRequest;
 import nhn.academy.service.MemberService;
@@ -11,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/login")
 public class LoginController {
     private final MemberService memberService;
-
+    public static final String LOGIN_USER = "LOGIN_USER";
     public LoginController(MemberService memberService) {
         this.memberService = memberService;
     }
@@ -20,12 +21,18 @@ public class LoginController {
     public String loginPage() {
         return "login";
     }
+
+
     @PostMapping
-    public ModelAndView processLogin(@ModelAttribute MemberLoginRequest loginRequest)  {
+    public ModelAndView processLogin(@ModelAttribute MemberLoginRequest loginRequest, HttpSession session)  {
         Member memberResponse = memberService.login(loginRequest);
         ModelAndView mav = new ModelAndView("home");
         mav.addObject("loginName", memberResponse.getName());
+        HttpSession newSession = session;   // 실전은 request.getSession(true) 새 세션 발급이 적절
+        newSession.setAttribute(LOGIN_USER, memberResponse);
         return mav;
     }
+
+
 }
 

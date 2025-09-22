@@ -1,5 +1,6 @@
 package nhn.academy.controller;
 
+import jakarta.servlet.http.HttpSession;
 import nhn.academy.model.*;
 import nhn.academy.model.annotation.Auth;
 import nhn.academy.service.MemberService;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static nhn.academy.controller.LoginController.LOGIN_USER;
 
 @RestController
 public class MemberController {
@@ -26,8 +29,12 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public Member getMe(){
-        return new Member("mandoo","신건영", 20, ClassType.A, Role.ADMIN);
+    public ResponseEntity<Member> getMe(HttpSession session){
+        Member member = (Member) session.getAttribute(LOGIN_USER);
+        if (member == null){
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok(member);
     }
 
     @PostMapping("/members")

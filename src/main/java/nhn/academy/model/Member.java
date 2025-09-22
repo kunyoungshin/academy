@@ -43,6 +43,7 @@ public class Member {
         this.age = value.getAge();
         this.clazz = value.getClazz();
         this.role = value.getRole();
+        this.password = value.getPassword();
     }
 
     public String getName() {
