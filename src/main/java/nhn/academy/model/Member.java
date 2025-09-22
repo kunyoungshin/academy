@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 public class Member {
     private String id;
-    private String password;
     private String name;
     private Integer age;
     @JsonSerialize(using = ToStringSerializer.class)
@@ -28,14 +27,6 @@ public class Member {
         this.role = role;
     }
 
-    public Member(String id, String name, Integer age, ClassType clazz, Role role, String password) {
-        this.id = id;
-        this.name = name;
-        this.age = age;
-        this.clazz = clazz;
-        this.role = role;
-        this.password = password;
-    }
 
     public Member(MemberEntity value) {
         this.id = value.getId();
@@ -43,7 +34,6 @@ public class Member {
         this.age = value.getAge();
         this.clazz = value.getClazz();
         this.role = value.getRole();
-        this.password = value.getPassword();
     }
 
     public String getName() {
@@ -64,13 +54,5 @@ public class Member {
 
     public String getId() {
         return id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

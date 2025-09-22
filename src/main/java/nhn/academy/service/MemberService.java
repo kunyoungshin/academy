@@ -61,10 +61,14 @@ public class MemberService {
     }
 
     public Member login(MemberLoginRequest loginRequest) {
-        Member member = getMember(loginRequest.getId());
-        if (!member.getPassword().equals(loginRequest.getPassword())) {
+        Object o = redisTemplate.opsForHash().get(HASH_NAME, loginRequest.getId());
+        if (o == null) {
+            throw new MemberNotFoundException();
+        }
+        MemberEntity memberEntity = redisMapper.convertValue(o, MemberEntity.class);
+        if (!memberEntity.getPassword().equals(loginRequest.getPassword())) {
             throw new InvalidPasswordException("Incorerect Password");
         }
-        return member;
+        return new Member(memberEntity);
     }
 }
