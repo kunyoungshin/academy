@@ -34,4 +34,6 @@ public class MemberCreateCommand {
     public String getPassword() {
         return password;
     }
+
+
 }

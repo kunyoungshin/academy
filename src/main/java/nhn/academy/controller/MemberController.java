@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
 
     @GetMapping("/name")
     public String getName(){
@@ -28,7 +30,6 @@ public class MemberController {
     public ResponseEntity addMember(@RequestBody MemberCreateCommand memberCreateCommand,
                                     @Auth Requester requester){
         memberService.createMember(memberCreateCommand);
-        System.out.println(memberCreateCommand);
         return ResponseEntity.ok().build();
     }
 
