@@ -39,7 +39,7 @@ public class RedisSessionFilter extends OncePerRequestFilter {
                     new PreAuthenticatedAuthenticationToken(sessionId, null);
             try {
                 Authentication auth = redisAuthenticationProvider.authenticate(preAuth);
-                SecurityContextHolder.getContext().setAuthentication(auth); // ✅ 성공하면 Security가 반환
+                SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (AuthenticationException e) {
                 SecurityContextHolder.clearContext();
             }
