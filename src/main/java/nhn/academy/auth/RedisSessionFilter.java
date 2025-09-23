@@ -12,6 +12,7 @@ import nhn.academy.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
@@ -23,19 +24,31 @@ import java.io.IOException;
 public class RedisSessionFilter extends OncePerRequestFilter {
 
 
-    @Autowired
-    private MemberService memberService;
+    private final RedisAuthenticationProvider redisAuthenticationProvider;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
+    public RedisSessionFilter(RedisAuthenticationProvider redisAuthenticationProvider) {
+        this.redisAuthenticationProvider = redisAuthenticationProvider;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
+        String sessionId = getSessionId(request);
+        if (sessionId != null) {
+            Authentication preAuth =
+                    new PreAuthenticatedAuthenticationToken(sessionId, null);
+            try {
+                Authentication auth = redisAuthenticationProvider.authenticate(preAuth);
+                SecurityContextHolder.getContext().setAuthentication(auth); // ✅ 성공하면 Security가 반환
+            } catch (AuthenticationException e) {
+                SecurityContextHolder.clearContext();
+            }
+        }
+        // 다음 필터로 요청 전달
+        filterChain.doFilter(request, response);
+    }
 
-        // 쿠키에서 세션 ID 가져오기
-
+    private static String getSessionId(HttpServletRequest request) {
         String sessionId = null;
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -45,27 +58,6 @@ public class RedisSessionFilter extends OncePerRequestFilter {
                 }
             }
         }
-
-        if (sessionId != null) {
-            // Redis에서 인증 정보 가져오기
-            Object o = redisTemplate.opsForValue().get(sessionId);
-            String username = (String) o;
-            if (username != null) {
-                try {
-                    Member member = memberService.getMember(username);
-                    AuthUser authUser = new AuthUser(member);
-                    Authentication auth = new PreAuthenticatedAuthenticationToken(authUser, null, authUser.getAuthorities());
-                    auth.setAuthenticated(true);
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }catch (Exception e) {
-
-                }
-
-            }
-        }
-
-
-        // 다음 필터로 요청 전달
-        filterChain.doFilter(request, response);
+        return sessionId;
     }
 }
