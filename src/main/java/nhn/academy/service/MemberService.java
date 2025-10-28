@@ -19,7 +19,7 @@ public class MemberService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    private String HASH_NAME = "Member:";
+    private String HASH_NAME = "Member";
 
     public void createMember(MemberCreateCommand memberCreateCommand) {
         Object o = redisTemplate.opsForHash().get(HASH_NAME, memberCreateCommand.getId());
