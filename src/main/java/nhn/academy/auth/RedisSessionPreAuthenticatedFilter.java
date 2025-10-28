@@ -8,4 +8,6 @@ public class RedisSessionPreAuthenticatedFilter extends AuthenticationFilter {
     public RedisSessionPreAuthenticatedFilter(AuthenticationManager authenticationManager, RedisSessionPreAuthenticatedConverter redisSessionConverter) {
         super(authenticationManager, redisSessionConverter);
     }
+
+
 }

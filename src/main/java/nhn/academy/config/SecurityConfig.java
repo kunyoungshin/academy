@@ -13,6 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
@@ -44,6 +45,9 @@ public class SecurityConfig {
 
         RedisSessionPreAuthenticatedFilter redisSessionFilter = new RedisSessionPreAuthenticatedFilter(authenticationManager, redisSessionConverter);
         redisSessionFilter.setSuccessHandler((req, res, auth) -> {});
+        redisSessionFilter.setFailureHandler(
+                new ClearSessionCookieFailureHandler());
+
         http.addFilterBefore(redisSessionFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.csrf(AbstractHttpConfigurer::disable);

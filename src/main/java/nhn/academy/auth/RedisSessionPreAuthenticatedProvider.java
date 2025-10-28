@@ -14,31 +14,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RedisSessionPreAuthenticatedProvider implements AuthenticationProvider {
-    private final RedisTemplate redisTemplate;
     private final MemberService memberService;
 
-    public RedisSessionPreAuthenticatedProvider(RedisTemplate redisTemplate, MemberService memberService) {
-        this.redisTemplate = redisTemplate;
+    public RedisSessionPreAuthenticatedProvider(MemberService memberService) {
         this.memberService = memberService;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) {
-        String sessionId = (String) authentication.getPrincipal();
-        Object o = redisTemplate.opsForValue().get(sessionId);
-        String username = (String) o;
-        if (username != null) {
-            try {
-                Member member = memberService.getMember(username);
-                AuthUser authUser = new AuthUser(member);
-                Authentication auth = new PreAuthenticatedAuthenticationToken(authUser, null, authUser.getAuthorities());
-                return auth;
-            }catch (Exception e) {
-
-            }
-
-        }
-        throw new BadCredentialsException("Invalid session");
+        String username  = (String) authentication.getPrincipal();
+        Member member = memberService.getMember(username);
+        AuthUser authUser = new AuthUser(member);
+        Authentication auth = new PreAuthenticatedAuthenticationToken(authUser, null, authUser.getAuthorities());
+        return auth;
     }
 
     @Override
