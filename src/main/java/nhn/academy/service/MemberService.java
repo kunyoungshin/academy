@@ -32,7 +32,7 @@ public class MemberService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private String HASH_NAME = "Member:";
+    private String HASH_NAME = "Member";
 
     public void createMember(MemberCreateCommand memberCreateCommand) {
         Object o = redisTemplate.opsForHash().get(HASH_NAME, memberCreateCommand.getId());

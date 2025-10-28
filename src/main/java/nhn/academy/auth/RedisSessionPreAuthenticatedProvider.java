@@ -7,17 +7,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 
+
 @Component
-public class RedisAuthenticationProvider implements AuthenticationProvider {
+public class RedisSessionPreAuthenticatedProvider implements AuthenticationProvider {
     private final RedisTemplate redisTemplate;
     private final MemberService memberService;
 
-    public RedisAuthenticationProvider(RedisTemplate redisTemplate, MemberService memberService) {
+    public RedisSessionPreAuthenticatedProvider(RedisTemplate redisTemplate, MemberService memberService) {
         this.redisTemplate = redisTemplate;
         this.memberService = memberService;
     }
@@ -43,6 +43,6 @@ public class RedisAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return PreAuthenticatedAuthenticationToken.class.isAssignableFrom(authentication);
+        return RedisSessionPreAuthenticatedToken.class.isAssignableFrom(authentication);
     }
 }
