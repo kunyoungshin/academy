@@ -20,9 +20,6 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-
-
-
     @Autowired
     private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     @Autowired
@@ -35,7 +32,6 @@ public class SecurityConfig {
         daoAuthenticationProvider.setUserDetailsService(customUserDetailsService);
         return daoAuthenticationProvider;
     }
-
     @Bean
     public AuthenticationManager authenticationManager(DaoAuthenticationProvider daoProvider,
                                                        RedisSessionPreAuthenticatedProvider redisProvider) {
@@ -43,9 +39,13 @@ public class SecurityConfig {
         return new ProviderManager(List.of(redisProvider, daoProvider));
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, RedisSessionPreAuthenticatedConverter redisSessionConverter) throws Exception {
+
+        RedisSessionPreAuthenticatedFilter redisSessionFilter = new RedisSessionPreAuthenticatedFilter(authenticationManager, redisSessionConverter);
+        redisSessionFilter.setSuccessHandler((req, res, auth) -> {});
+        http.addFilterBefore(redisSessionFilter, UsernamePasswordAuthenticationFilter.class);
+
         http.csrf(AbstractHttpConfigurer::disable);
         http.formLogin((formLogin) ->
                 formLogin.loginPage("/auth/login")
@@ -66,9 +66,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
         );
 
-        RedisSessionPreAuthenticatedFilter redisSessionFilter = new RedisSessionPreAuthenticatedFilter(authenticationManager, redisSessionConverter);
-        redisSessionFilter.setSuccessHandler((req, res, auth) -> {});
-        http.addFilterBefore(redisSessionFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         // csrf diable
         http.csrf(AbstractHttpConfigurer::disable);
