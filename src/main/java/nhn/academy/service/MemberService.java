@@ -25,7 +25,7 @@ public class MemberService {
     @Autowired
     private ObjectMapper redisMapper;
 
-    private String HASH_NAME = "Member:";
+    private String HASH_NAME = "Member";
 
     public void createMember(MemberCreateCommand memberCreateCommand) {
         Object o = redisTemplate.opsForHash().get(HASH_NAME, memberCreateCommand.getId());
