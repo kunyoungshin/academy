@@ -1,6 +1,8 @@
 package nhn.academy.service;
 
+import nhn.academy.model.AuthUser;
 import nhn.academy.model.Member;
+import nhn.academy.model.MemberEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,27 +18,14 @@ import java.util.Map;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final PasswordEncoder passwordEncoder;
-    MemberService memberService;
-
-
-    public CustomUserDetailsService(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+    private MemberService memberService;
+    public CustomUserDetailsService(MemberService memberService) {
+        this.memberService = memberService;
     }
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        if(username.equals("admin")){
-            return new User("admin", passwordEncoder.encode("admin"), Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
-        }else if(username.equals("member")){
-            return new User("member", passwordEncoder.encode("member"), Arrays.asList(new SimpleGrantedAuthority("ROLE_MEMBER")));
-        }
-
-        throw new UsernameNotFoundException("User not found");
-
-
-
+        MemberEntity memberEntity = memberService.getMemberEntity(username);
+        return new AuthUser(memberEntity);
     }
 }

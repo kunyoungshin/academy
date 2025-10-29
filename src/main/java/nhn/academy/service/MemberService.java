@@ -78,4 +78,13 @@ public class MemberService {
         }
         throw new MemberNotFoundException();// TODO 401
     }
+
+    public MemberEntity getMemberEntity(String id) {
+        Object o = redisTemplate.opsForHash().get(HASH_NAME, id);
+        if (o == null) {
+            throw new MemberNotFoundException();
+        }
+        MemberEntity memberEntity = redisMapper.convertValue(o, MemberEntity.class);
+        return memberEntity;
+    }
 }

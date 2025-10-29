@@ -23,10 +23,10 @@ POST localhost:8080/members
 Content-Type: application/json
 
 {
-  "id" : "kim",
-  "name" : "kim",
+  "id" : "mandoo",
+  "name" : "mandoo",
   "age" : 30,
   "class" : "A",
   "role" : "member",
-  "password": "182938192839akfjaskfjaskfjkasjadsasdasd"
+  "password": "test"
 }
