@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: academy
+
+
+server:
+  port: 8080

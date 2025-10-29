@@ -10,14 +10,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import static nhn.academy.controller.LoginController.LOGIN_USER;
 
 @RestController
 public class MemberController {
+
+    public static final String LOGIN_USER = "LOGIN_USER";
     @Autowired
     private MemberService memberService;
 

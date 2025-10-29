@@ -6,10 +6,12 @@ import nhn.academy.model.MemberCreateCommand;
 import nhn.academy.model.MemberLoginRequest;
 import nhn.academy.model.exception.InvalidPasswordException;
 import nhn.academy.model.MemberEntity;
+import nhn.academy.model.MemberLoginRequest;
 import nhn.academy.model.exception.MemberAlreadyExistsException;
 import nhn.academy.model.exception.MemberNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +25,9 @@ public class MemberService {
     private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private ObjectMapper redisMapper;
 
     private String HASH_NAME = "Member";
@@ -32,7 +37,8 @@ public class MemberService {
         if (o != null) {
             throw new MemberAlreadyExistsException("already used id");
         }
-        MemberEntity memberEntity = new MemberEntity(memberCreateCommand);
+        String encoded = passwordEncoder.encode(memberCreateCommand.getPassword());;
+        MemberEntity memberEntity = new MemberEntity(memberCreateCommand, encoded);
         redisTemplate.opsForHash().put(HASH_NAME, memberEntity.getId(), memberEntity);
     }
 
@@ -65,10 +71,11 @@ public class MemberService {
         if (o == null) {
             throw new MemberNotFoundException();
         }
+
         MemberEntity memberEntity = redisMapper.convertValue(o, MemberEntity.class);
-        if (!memberEntity.getPassword().equals(loginRequest.getPassword())) {
-            throw new InvalidPasswordException("Incorerect Password");
+        if (memberEntity.getPassword().equals(loginRequest.getPassword())) {
+            return new Member(memberEntity);
         }
-        return new Member(memberEntity);
+        throw new MemberNotFoundException();// TODO 401
     }
 }
