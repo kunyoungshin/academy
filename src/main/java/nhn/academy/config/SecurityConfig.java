@@ -26,16 +26,31 @@ public class SecurityConfig {
                 authorizeRequests.requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/private-project/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MEMBER")
                         .requestMatchers("/public-project/**").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/members").permitAll()
                         .anyRequest().authenticated()
         );
+
+
 
 
         // csrf diable
         http.csrf(AbstractHttpConfigurer::disable);
 
 
-        http.formLogin(Customizer.withDefaults());
+
+        http.formLogin((formLogin) ->
+                formLogin.loginPage("/auth/login")
+                        .usernameParameter("id")
+                        .passwordParameter("pwd")
+                        .loginProcessingUrl("/login/process")
+
+        );
+
+        http.exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
+                        httpSecurityExceptionHandlingConfigurer.accessDeniedPage("/403")
+                );
+
 
         return http.build();
     }
