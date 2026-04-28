@@ -25,11 +25,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addViewController("/public-project/**").setViewName("public-project");
     }
 
-
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         System.out.println(converters);
     }
+    
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
