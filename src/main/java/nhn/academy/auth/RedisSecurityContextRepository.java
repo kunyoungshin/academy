@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
@@ -27,12 +29,13 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 
     private final RedisTemplate<String, Object> redisTemplate;
 
+    // JSON 직렬화는 SecurityJackson2Modules + allowlist 등록이 번거로워 JDK 직렬화 사용
     public RedisSecurityContextRepository(RedisConnectionFactory connectionFactory) {
-        // TODO #1: RedisTemplate 생성 후 connectionFactory 연결
-        //  - keySerializer 는 StringRedisSerializer
-        //  - valueSerializer 는 JdkSerializationRedisSerializer (AuthUser 는 Serializable 구현 필요)
-        //  - afterPropertiesSet() 호출
-        this.redisTemplate = null;
+        this.redisTemplate = new RedisTemplate<>();
+        this.redisTemplate.setConnectionFactory(connectionFactory);
+        this.redisTemplate.setKeySerializer(new StringRedisSerializer());
+        this.redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+        this.redisTemplate.afterPropertiesSet();
     }
 
     // 매 요청마다 SecurityContextHolderFilter 가 호출 -> Redis 에서 SecurityContext 복원
@@ -42,9 +45,10 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
         if (sessionId == null) {
             return SecurityContextHolder.createEmptyContext();
         }
-
-        // TODO #2: Redis 에서 (REDIS_KEY_PREFIX + sessionId) 키로 값을 조회해
-        //  SecurityContext 면 그대로 리턴, 아니면 빈 컨텍스트 리턴
+        Object value = redisTemplate.opsForValue().get(REDIS_KEY_PREFIX + sessionId);
+        if (value instanceof SecurityContext context) {
+            return context;
+        }
         return SecurityContextHolder.createEmptyContext();
     }
 
@@ -56,8 +60,7 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
             sessionId = UUID.randomUUID().toString();
             writeCookie(response, sessionId);
         }
-
-        // TODO #3: redisTemplate 으로 (REDIS_KEY_PREFIX + sessionId) 키에 context 저장 (TTL: EXPIRE)
+        redisTemplate.opsForValue().set(REDIS_KEY_PREFIX + sessionId, context, EXPIRE);
     }
 
     @Override
@@ -70,8 +73,14 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
     }
 
     private String readCookie(HttpServletRequest request) {
-        // TODO #4: request 의 쿠키 배열에서 이름이 COOKIE_NAME 인 쿠키의 value 를 리턴
-        //  (없으면 null 리턴)
+        if (request.getCookies() == null) {
+            return null;
+        }
+        for (Cookie cookie : request.getCookies()) {
+            if (COOKIE_NAME.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
         return null;
     }
 
