@@ -2,6 +2,7 @@ package nhn.academy.config;
 
 import nhn.academy.auth.CustomAuthenticationFailureHandler;
 import nhn.academy.auth.CustomAuthenticationSuccessHandler;
+import nhn.academy.auth.RedisSecurityContextRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,11 +23,12 @@ public class SecurityConfig {
     @Autowired
     private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
+    @Autowired
+    private RedisSecurityContextRepository redisSecurityContextRepository;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-//        CustomAuthenticationFailureHandler customAuthenticationFailureHandler = new CustomAuthenticationFailureHandler(loginAttemptService);
-//        CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler = new CustomAuthenticationSuccessHandler(loginAttemptService);
         http.csrf(AbstractHttpConfigurer::disable);
         http.formLogin((formLogin) ->
                 formLogin.loginPage("/auth/login")
@@ -35,8 +37,6 @@ public class SecurityConfig {
                         .loginProcessingUrl("/auth/login/process")
                         .successHandler(customAuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
-
-
 
         ).authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests.requestMatchers("/admin/**").hasRole("ADMIN")
@@ -48,8 +48,8 @@ public class SecurityConfig {
         );
         // csrf diable
         http.csrf(AbstractHttpConfigurer::disable);
-        // UsernamePasswordAuthenticationFilter가 활성화
-        http.formLogin(Customizer.withDefaults());
+        http.securityContext(s->s.securityContextRepository(redisSecurityContextRepository));
+
         return http.build();
     }
 
